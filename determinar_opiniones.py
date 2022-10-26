@@ -12,6 +12,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
+from sklearn import svm
 
 class Predicciones_cambio_climatico:
     def __init__(self, name_df):
@@ -48,18 +49,18 @@ class Predicciones_cambio_climatico:
         self.mensajesTwitter["TWEET"] = self.mensajesTwitter["TWEET"].apply(self.normalizacion)
 
         # 3
-        stopWords = stopwords.words('english')
-        self.mensajesTwitter['TWEET'] = self.mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([palabra for palabra in mensaje.split() if palabra not in (stopWords)]))
+        self.stopWords = stopwords.words('english')
+        self.mensajesTwitter['TWEET'] = self.mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([palabra for palabra in mensaje.split() if palabra not in (self.stopWords)]))
 
         # 4
-        stemmer = SnowballStemmer('english')
-        self.mensajesTwitter['TWEET'] = self.mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([stemmer.stem(palabra) for palabra in mensaje.split(' ')]))
+        self.stemmer = SnowballStemmer('english')
+        self.mensajesTwitter['TWEET'] = self.mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([self.stemmer.stem(palabra) for palabra in mensaje.split(' ')]))
 
         # 5
-        lemmatizer = WordNetLemmatizer()
-        self.mensajesTwitter['TWEET'] = self.mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([lemmatizer.lemmatize(palabra) for palabra in mensaje.split(' ')]))
+        self.lemmatizer = WordNetLemmatizer()
+        self.mensajesTwitter['TWEET'] = self.mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([self.lemmatizer.lemmatize(palabra) for palabra in mensaje.split(' ')]))
 
-    def aprendizaje(self):
+    def aprendizaje_bayesiano(self):
 
         # Separamos nuestro dataset en variables de entrenamiento y de test (con un 80% y 20% respectivamente)
         X_train, X_test, y_train, y_test = train_test_split(self.mensajesTwitter['TWEET'].values,  self.mensajesTwitter['CREENCIA'].values,test_size=0.2)
@@ -77,11 +78,50 @@ class Predicciones_cambio_climatico:
         etapas_aprendizaje = Pipeline([('frequencia', CountVectorizer()),('tfidf', TfidfTransformer()),('algoritmo', MultinomialNB())])
 
         # Ajustamos el modelo a nuestras variables de entrenamiento
-        modelo = etapas_aprendizaje.fit(X_train,y_train)
+        self.modelo = etapas_aprendizaje.fit(X_train,y_train)
 
         # classification_report: Printeamos un grafico que nos muestra algunas características de nuestro modelo
         # Observamos la precisión y la validez del mismo mediante la función predict y nuestras variables de testeo
+        print(classification_report(y_test, self.modelo.predict(X_test), digits=4))
+
+
+    # Support Vector Machine (algoritmo de aprendizaje supervisado)
+    def aprendizaje_svm(self, parametroC = 2):
+
+        # Separamos nuestro dataset igual que antes
+        X_train, X_test, y_train, y_test = train_test_split(self.mensajesTwitter['TWEET'].values,  self.mensajesTwitter['CREENCIA'].values,test_size=0.2)
+
+        # Canalizamos nuevamente mediante pipeline, sin embargo, ahora indicamos el nuevo aprendizaje que vamos a seguir(SVM)
+        etapas_aprendizaje = Pipeline([('frequencia', CountVectorizer()),('tfidf', TfidfTransformer()),('algoritmo', svm.SVC(kernel = 'linear', C = 2))])
+        self.modelo = etapas_aprendizaje.fit(X_train,y_train)
         print(classification_report(y_test, modelo.predict(X_test), digits=4))
+
+
+    def buscarC_optimo
+
+
+
+    def predecir_frase(self, frase):
+        #Normalización
+        frase = self.normalizacion(frase)
+
+        #Eliminación de las stops words
+        frase = ' '.join([palabra for palabra in frase.split() if palabra not in (stopWords)])
+
+        #Aplicación de stemming
+        frase =  ' '.join([self.stemmer.stem(palabra) for palabra in frase.split(' ')])
+
+        #Lematización
+        frase = ' '.join([self.lemmatizer.lemmatize(palabra) for palabra in frase.split(' ')])
+
+        prediccion = self.modelo.predict([frase])
+
+        if(prediccion[0]==0):
+            return True
+
+        else:
+            return False
+
 
 
 
