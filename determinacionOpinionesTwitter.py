@@ -25,13 +25,10 @@ import nltk
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-#Información sobre la cantidad de observaciones y su contenido
-print(mensajesTwitter.shape)
-print(mensajesTwitter.head(2))
 
 #Transformación de la característica Creencia
 mensajesTwitter['CREENCIA'] = (mensajesTwitter['CREENCIA']=='Yes').astype(int)
-print(mensajesTwitter.head(100))
+
 
 #Función de normalización
 import re
@@ -46,7 +43,7 @@ def normalizacion(mensaje):
 
 #Normalización
 mensajesTwitter["TWEET"] = mensajesTwitter["TWEET"].apply(normalizacion)
-print(mensajesTwitter.head(10))
+
 
 #Carga de StopWords
 from nltk.corpus import stopwords
@@ -54,21 +51,21 @@ stopWords = stopwords.words('english')
 
 #Eliminación de las Stops Words en las distintas frases
 mensajesTwitter['TWEET'] = mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([palabra for palabra in mensaje.split() if palabra not in (stopWords)]))
-print(mensajesTwitter.head(10))
+
 
 
 #Aplicación de stemming
 from nltk.stem.snowball import SnowballStemmer
 stemmer = SnowballStemmer('english')
 mensajesTwitter['TWEET'] = mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([stemmer.stem(palabra) for palabra in mensaje.split(' ')]))
-print(mensajesTwitter.head(10))
+
 
 
 #Lematización
 from nltk.stem import WordNetLemmatizer
 lemmatizer = WordNetLemmatizer()
 mensajesTwitter['TWEET'] = mensajesTwitter['TWEET'].apply(lambda mensaje: ' '.join([lemmatizer.lemmatize(palabra) for palabra in mensaje.split(' ')]))
-print(mensajesTwitter.head(10))
+
 
 print("¡Fin de la preparación!")
 
