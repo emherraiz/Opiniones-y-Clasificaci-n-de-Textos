@@ -1,0 +1,6 @@
+pandas
+platform
+re
+os
+nltk
+sklearn
