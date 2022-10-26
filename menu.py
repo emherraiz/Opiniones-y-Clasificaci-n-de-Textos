@@ -4,14 +4,18 @@ import helpers
 
 
 def lanzar():
+    '''Lanza el menu
+    '''
+
+    print("========================")
+    print('PREPARANDO...')
+    print("========================")
+    tweets = determinar_opiniones.Predicciones_cambio_climatico('datas/calentamientoClimatico.csv')
+    tweets.preparacion()
+    tweets.dividir_dataset()
+
+
     while True:
-
-        print("========================")
-        print('PREPARANDO...')
-        tweets = determinar_opiniones.Predicciones_cambio_climatico('datas/calentamientoClimatico.csv')
-        tweets.preparacion()
-        tweets.dividir_dataset()
-
         helpers.limpiar_pantalla()
         print("========================")
         print(" BIENVENIDO AL Manager ")

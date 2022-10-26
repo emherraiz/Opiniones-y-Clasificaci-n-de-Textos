@@ -1,4 +1,5 @@
 import re
+from numpy import NAN
 import pandas as pd
 
 # El modulo nltk esta en desuso puesto que no funciona bien del todo
@@ -26,8 +27,9 @@ class Predicciones_cambio_climatico:
             name_csv (String): Nombre del csv
         '''
 
-
         self.mensajesTwitter = pd.read_csv(name_csv, delimiter=";")
+        self.lemmatizer = NAN
+        self.stemmer = NAN
 
     def normalizacion(self, mensaje):
         '''Normalizamos el mensaje identificando URL y USER, utilizando caracteres reconocibles(sin acentos) y pasando el texto a minúsculas.
